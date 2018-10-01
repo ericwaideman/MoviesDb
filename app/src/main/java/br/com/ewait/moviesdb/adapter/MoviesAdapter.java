@@ -7,7 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
@@ -19,21 +23,24 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieAdapt
     private ArrayList<Movie> mMovieData;
 
     private final MovieAdapterOnClickHandler mClickHandler;
+    private final Context mContext;
 
     public interface MovieAdapterOnClickHandler {
         void onClick(Movie clickedMovie);
     }
 
-    public MoviesAdapter(MovieAdapterOnClickHandler clickHandler) {
+    public MoviesAdapter(MovieAdapterOnClickHandler clickHandler, Context context) {
+        mContext = context;
         mClickHandler = clickHandler;
     }
 
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
-        final TextView mWeatherTextView;
+        final ImageView iv_poster;
 
         MovieAdapterViewHolder(View view) {
             super(view);
-            mWeatherTextView = view.findViewById(R.id.tv_movie_data);
+            iv_poster = view.findViewById(R.id.iv_poster);
+
             view.setOnClickListener(this);
         }
 
@@ -62,7 +69,11 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieAdapt
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder forecastAdapterViewHolder, int position) {
 
         Movie currentMovie = mMovieData.get(position);
-        forecastAdapterViewHolder.mWeatherTextView.setText(currentMovie.getTitle());
+
+        Glide.with(mContext)
+                .load(currentMovie.getPosterPath())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(forecastAdapterViewHolder.iv_poster);
     }
 
     @Override
@@ -71,8 +82,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieAdapt
         return mMovieData.size();
     }
 
-    public void setMovieData(ArrayList<Movie> weatherData) {
-        mMovieData = weatherData;
+    public void setMovieData(ArrayList<Movie> newData) {
+        if (mMovieData != null) {
+            mMovieData.clear();
+            mMovieData.addAll(newData);
+        }
+        else {
+            mMovieData = newData;
+        }
         notifyDataSetChanged();
     }
+
 }

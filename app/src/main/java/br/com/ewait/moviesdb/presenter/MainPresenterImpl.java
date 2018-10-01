@@ -17,24 +17,22 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
 
     @Override
     public void onDestroy() {
-
         mainView = null;
-
     }
 
-    @Override
-    public void onRefreshButtonClick() {
-
+    private void showProgress(boolean needShow) {
         if(mainView != null){
-            mainView.showProgress();
+            if (needShow)
+                mainView.showProgress();
+            else
+                mainView.hideProgress();
         }
-        getNoticeIntractor.getMovies(MovieEndpoint.POPULAR, 1 ,this);
-
     }
 
     @Override
-    public void requestDataFromServer() {
-        getNoticeIntractor.getMovies(MovieEndpoint.POPULAR, 1 ,this);
+    public void requestDataFromServer(MovieEndpoint endpoint) {
+        showProgress(true);
+        getNoticeIntractor.getMovies(endpoint, 1 ,this);
     }
 
 
@@ -42,7 +40,7 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
     public void onFinished(ArrayList<Movie> noticeArrayList) {
         if(mainView != null){
             mainView.setDataToRecyclerView(noticeArrayList);
-            mainView.hideProgress();
+            showProgress(false);
         }
     }
 
@@ -50,7 +48,7 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
     public void onFailure(Throwable t) {
         if(mainView != null){
             mainView.onResponseFailure(t);
-            mainView.hideProgress();
+            showProgress(false);
         }
     }
 }

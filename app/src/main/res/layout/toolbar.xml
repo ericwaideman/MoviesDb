@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/Widget.AppCompat.Toolbar"
+    android:minHeight="10dp">
+
+    <ProgressBar
+        android:id="@+id/progress_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"/>
+
+</android.support.v7.widget.Toolbar>

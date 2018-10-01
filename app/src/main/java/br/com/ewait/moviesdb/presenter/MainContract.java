@@ -12,9 +12,7 @@ public interface MainContract {
 
         void onDestroy();
 
-        void onRefreshButtonClick();
-
-        void requestDataFromServer();
+        void requestDataFromServer(MovieEndpoint endpoint);
 
     }
 

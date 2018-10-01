@@ -1,11 +1,11 @@
 package br.com.ewait.moviesdb;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -15,15 +15,17 @@ import java.util.ArrayList;
 
 import br.com.ewait.moviesdb.adapter.MoviesAdapter;
 import br.com.ewait.moviesdb.model.Movie;
-import br.com.ewait.moviesdb.presenter.MoviesIntractorImpl;
+import br.com.ewait.moviesdb.model.MovieEndpoint;
 import br.com.ewait.moviesdb.presenter.MainContract;
 import br.com.ewait.moviesdb.presenter.MainPresenterImpl;
+import br.com.ewait.moviesdb.presenter.MoviesIntractorImpl;
 
-public class MainActivity extends AppCompatActivity implements MainContract.MainView {
+public class MainActivity extends AppCompatActivity implements MainContract.MainView, BottomNavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = MainActivity.class.getName();
 
     private RecyclerView mRecyclerView;
+    private BottomNavigationView navigationView;
     private MainContract.presenter presenter;
 
     private ProgressBar mLoadingIndicator;
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
         initializeComponents();
 
         presenter = new MainPresenterImpl(this, new MoviesIntractorImpl());
-        presenter.requestDataFromServer();
+        presenter.requestDataFromServer(MovieEndpoint.POPULAR);
     }
 
     @Override
@@ -49,13 +51,22 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
 
         mRecyclerView = findViewById(R.id.recyclerview_movies);
 
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
+        navigationView = findViewById(R.id.navigationView);
+        navigationView.setOnNavigationItemSelectedListener(this);
+
+        //StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.toolbar);
+        mLoadingIndicator = findViewById(R.id.progress_spinner);
 
     }
 
@@ -67,19 +78,29 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
 
     @Override
     public void showProgress() {
-        mLoadingIndicator.setVisibility(View.VISIBLE);
+        if (mLoadingIndicator != null)
+            mLoadingIndicator.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (mLoadingIndicator != null)
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDataToRecyclerView(ArrayList<Movie> movieArrayList) {
-        MoviesAdapter adapter = new MoviesAdapter(recyclerItemClickListener);
-        adapter.setMovieData(movieArrayList);
-        mRecyclerView.setAdapter(adapter);
+        MoviesAdapter adapter;
+
+        if(mRecyclerView.getAdapter() == null) {
+            adapter = new MoviesAdapter(recyclerItemClickListener, this);
+            adapter.setMovieData(movieArrayList);
+            mRecyclerView.setAdapter(adapter);
+        }
+        else {
+            adapter = (MoviesAdapter) mRecyclerView.getAdapter();
+            adapter.setMovieData(movieArrayList);
+        }
     }
 
     @Override
@@ -90,20 +111,17 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_refresh) {
-            presenter.onRefreshButtonClick();
+        switch (menuItem.getItemId())
+        {
+            case R.id.navigation_popular:
+                presenter.requestDataFromServer(MovieEndpoint.POPULAR);
+                break;
+            case R.id.navigation_top_rated:
+                presenter.requestDataFromServer(MovieEndpoint.TOP_RATED);
+                break;
         }
-
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 }
