@@ -3,7 +3,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="br.com.ewait.moviesdb.MainActivity">
+    tools:context="br.com.ewait.moviesdb.main.MainActivity">
 
     <item
         android:id="@+id/navigation_popular"

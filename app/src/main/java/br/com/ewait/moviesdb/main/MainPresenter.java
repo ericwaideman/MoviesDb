@@ -1,27 +1,26 @@
-package br.com.ewait.moviesdb.presenter;
+package br.com.ewait.moviesdb.main;
 
 import java.util.ArrayList;
 
 import br.com.ewait.moviesdb.model.Movie;
 import br.com.ewait.moviesdb.model.MovieEndpoint;
 
-public class MainPresenterImpl implements MainContract.presenter, MainContract.GetMovieIntractor.OnFinishedListener {
+public class MainPresenter implements GetMoviesInteractor.OnFinishedListener {
 
-    private MainContract.MainView mainView;
-    private MainContract.GetMovieIntractor getNoticeIntractor;
+    private MainView mainView;
+    private GetMoviesInteractor getMovieInteractor;
 
-    public MainPresenterImpl(MainContract.MainView mainView, MainContract.GetMovieIntractor getNoticeIntractor) {
+    public MainPresenter(MainView mainView, GetMoviesInteractor interactor) {
         this.mainView = mainView;
-        this.getNoticeIntractor = getNoticeIntractor;
+        this.getMovieInteractor = interactor;
     }
 
-    @Override
     public void onDestroy() {
         mainView = null;
     }
 
     private void showProgress(boolean needShow) {
-        if(mainView != null){
+        if (mainView != null) {
             if (needShow)
                 mainView.showProgress();
             else
@@ -29,16 +28,15 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
         }
     }
 
-    @Override
     public void requestDataFromServer(MovieEndpoint endpoint) {
         showProgress(true);
-        getNoticeIntractor.getMovies(endpoint, 1 ,this);
+        getMovieInteractor.getMovies(endpoint, 1, this);
     }
 
 
     @Override
     public void onFinished(ArrayList<Movie> noticeArrayList) {
-        if(mainView != null){
+        if (mainView != null) {
             mainView.setDataToRecyclerView(noticeArrayList);
             showProgress(false);
         }
@@ -46,7 +44,7 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
 
     @Override
     public void onFailure(Throwable t) {
-        if(mainView != null){
+        if (mainView != null) {
             mainView.onResponseFailure(t);
             showProgress(false);
         }

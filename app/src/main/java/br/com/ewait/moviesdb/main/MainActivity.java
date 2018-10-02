@@ -1,5 +1,6 @@
-package br.com.ewait.moviesdb;
+package br.com.ewait.moviesdb.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -13,22 +14,19 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import br.com.ewait.moviesdb.R;
 import br.com.ewait.moviesdb.adapter.MoviesAdapter;
+import br.com.ewait.moviesdb.details.DetailsActivity;
 import br.com.ewait.moviesdb.model.Movie;
 import br.com.ewait.moviesdb.model.MovieEndpoint;
-import br.com.ewait.moviesdb.presenter.MainContract;
-import br.com.ewait.moviesdb.presenter.MainPresenterImpl;
-import br.com.ewait.moviesdb.presenter.MoviesIntractorImpl;
+import br.com.ewait.moviesdb.utils.MovieUtils;
 
-public class MainActivity extends AppCompatActivity implements MainContract.MainView, BottomNavigationView.OnNavigationItemSelectedListener {
-
-    private static final String TAG = MainActivity.class.getName();
+public class MainActivity extends AppCompatActivity implements MainView, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView mRecyclerView;
-    private BottomNavigationView navigationView;
-    private MainContract.presenter presenter;
+    private MainPresenter presenter;
 
-    private ProgressBar mLoadingIndicator;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
 
         initializeComponents();
 
-        presenter = new MainPresenterImpl(this, new MoviesIntractorImpl());
+        presenter = new MainPresenter(this, new GetMoviesInteractor());
         presenter.requestDataFromServer(MovieEndpoint.POPULAR);
     }
 
@@ -51,53 +49,48 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
 
         mRecyclerView = findViewById(R.id.recyclerview_movies);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setLogo(R.mipmap.ic_launcher);
-        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        progressBar = findViewById(R.id.progressBar);
 
-        navigationView = findViewById(R.id.navigationView);
+        BottomNavigationView navigationView = findViewById(R.id.navigationView);
         navigationView.setOnNavigationItemSelectedListener(this);
 
-        //StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
 
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
 
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.toolbar);
-        mLoadingIndicator = findViewById(R.id.progress_spinner);
-
     }
 
     private MoviesAdapter.MovieAdapterOnClickHandler recyclerItemClickListener = movie -> {
-        Toast.makeText(MainActivity.this,
-                "List title:  " + movie.getTitle(),
-                Toast.LENGTH_LONG).show();
+
+        Intent i = new Intent(this, DetailsActivity.class);
+        i.putExtra(MovieUtils.EXTRA_SELECTED_MOVIE, movie);
+        startActivity(i);
+
     };
 
     @Override
     public void showProgress() {
-        if (mLoadingIndicator != null)
-            mLoadingIndicator.setVisibility(View.VISIBLE);
+        clearData();
+        if (progressBar != null)
+            progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideProgress() {
-        if (mLoadingIndicator != null)
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if (progressBar != null)
+            progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void setDataToRecyclerView(ArrayList<Movie> movieArrayList) {
         MoviesAdapter adapter;
 
-        if(mRecyclerView.getAdapter() == null) {
+        if (mRecyclerView.getAdapter() == null) {
             adapter = new MoviesAdapter(recyclerItemClickListener, this);
             adapter.setMovieData(movieArrayList);
             mRecyclerView.setAdapter(adapter);
-        }
-        else {
+        } else {
             adapter = (MoviesAdapter) mRecyclerView.getAdapter();
             adapter.setMovieData(movieArrayList);
         }
@@ -106,15 +99,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
     @Override
     public void onResponseFailure(Throwable throwable) {
         Toast.makeText(MainActivity.this,
-                "Something went wrong...Error message: " + throwable.getMessage(),
+                "Error: " + throwable.getMessage(),
                 Toast.LENGTH_LONG).show();
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
-        switch (menuItem.getItemId())
-        {
+        switch (menuItem.getItemId()) {
             case R.id.navigation_popular:
                 presenter.requestDataFromServer(MovieEndpoint.POPULAR);
                 break;
@@ -124,4 +116,12 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
         }
         return true;
     }
+
+    private void clearData() {
+        MoviesAdapter adapter = (MoviesAdapter) mRecyclerView.getAdapter();
+
+        if (adapter != null)
+            adapter.setMovieData(new ArrayList<>());
+    }
+
 }

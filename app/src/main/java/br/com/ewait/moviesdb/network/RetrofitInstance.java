@@ -1,5 +1,7 @@
 package br.com.ewait.moviesdb.network;
 
+import br.com.ewait.moviesdb.model.Movie;
+import br.com.ewait.moviesdb.utils.MovieUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -18,7 +20,7 @@ public class RetrofitInstance {
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(chain ->  {
-                Request request = chain.request().newBuilder().addHeader("api-key", MoviesDataService.API_KEY).build();
+                Request request = chain.request().newBuilder().addHeader("api-key", MovieUtils.getTmdbApiKey()).build();
                 return chain.proceed(request);
         }).build();
 

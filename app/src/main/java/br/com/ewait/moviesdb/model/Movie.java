@@ -1,10 +1,11 @@
 package br.com.ewait.moviesdb.model;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Movie {
+public class Movie implements Serializable {
 
     @SerializedName("vote_count")
     @Expose
