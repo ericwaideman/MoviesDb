@@ -1,6 +1,5 @@
 package br.com.ewait.moviesdb.network;
 
-import br.com.ewait.moviesdb.model.Movie;
 import br.com.ewait.moviesdb.utils.MovieUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -10,9 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitInstance {
 
-    private static Retrofit instance = null;
-
-    private static final String MOVIESDB_BASE_URL = "https://api.themoviedb.org/3/";
+    private static final String TMDB_BASE_URL = "https://api.themoviedb.org/3/";
 
     public static Retrofit getClient() {
 
@@ -24,13 +21,11 @@ public class RetrofitInstance {
                 return chain.proceed(request);
         }).build();
 
-        instance = new Retrofit.Builder()
-                .baseUrl(MOVIESDB_BASE_URL)
+        return new Retrofit.Builder()
+                .baseUrl(TMDB_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build();
-
-        return instance;
     }
 
 }

@@ -1,7 +1,6 @@
 package br.com.ewait.moviesdb.network;
 
 import br.com.ewait.moviesdb.model.MovieList;
-import br.com.ewait.moviesdb.utils.MovieUtils;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

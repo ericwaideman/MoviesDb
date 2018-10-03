@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import br.com.ewait.moviesdb.model.Movie;
 
-public interface MainView {
+interface MainView {
 
     void showProgress();
 

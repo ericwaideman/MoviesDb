@@ -8,7 +8,7 @@ import br.com.ewait.moviesdb.model.MovieEndpoint;
 public class MainPresenter implements GetMoviesInteractor.OnFinishedListener {
 
     private MainView mainView;
-    private GetMoviesInteractor getMovieInteractor;
+    private final GetMoviesInteractor getMovieInteractor;
 
     public MainPresenter(MainView mainView, GetMoviesInteractor interactor) {
         this.mainView = mainView;

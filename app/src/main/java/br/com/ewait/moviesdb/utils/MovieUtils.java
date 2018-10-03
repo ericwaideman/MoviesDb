@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import br.com.ewait.moviesdb.BuildConfig;
 
+@SuppressWarnings("ALL")
 public class MovieUtils {
 
     public static final String EXTRA_SELECTED_MOVIE = "extra_selected_movie";

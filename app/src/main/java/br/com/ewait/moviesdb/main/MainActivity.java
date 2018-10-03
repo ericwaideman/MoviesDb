@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MainView, BottomN
 
     }
 
-    private MoviesAdapter.MovieAdapterOnClickHandler recyclerItemClickListener = movie -> {
+    private final MoviesAdapter.MovieAdapterOnClickHandler recyclerItemClickListener = movie -> {
 
         Intent i = new Intent(this, DetailsActivity.class);
         i.putExtra(MovieUtils.EXTRA_SELECTED_MOVIE, movie);
